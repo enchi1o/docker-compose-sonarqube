@@ -4,10 +4,9 @@ This is a quick set up to install SonarQube and its associated technology. The m
 
 ## Technolog Stack
 
-1. SonarQube Community Edition 7.8
-2. Postgresql 10
+1. SonarQube Community Edition
+2. Postgresql 12
 3. Nginx
-4. OpenJDK 8
 
 ## Getting Started
 
@@ -19,39 +18,6 @@ Please ensure these tools are installed in your system.
 
 1. docker
 2. docker-compose
-
-### Build the Docker Image
-
-1. Build Postgresql Image
-
-```
-cd /build/postgresql
-docker build --tag postgresql:10 --file Dockerfile .
-
-# Save the image as tar
-docker save postgresql:10  > postgresql-10.tar
-```
-
-2. Build SonarQube Image
-
-The Dockerfile for SonarQube included stepps to load self-signed certificates into the container's java truststore. This is important if you required interaction to internal systems that enabled TLS with self-signed certificates. Copy the needed certificates based on your context.
-
-```
-# Example for copying a root ca to java trust store
-
-COPY /certs/root.crt /tmp/
-
-RUN keytool -import -v -trustcacerts -alias sonarqube -file /tmp/root.crt \
-    -keystore ${JAVA_HOME}/jre/lib/security/cacerts -noprompt -storepass changeit
-```
-
-```
-cd /build/sonarqube
-docker build --tag sonarqube:hive --file Dockerfile .
-
-# Save the image as tar
-docker save sonarqube:hive  > sonarqube-hive.tar
-```
 
 ### Copy The Docker Container Images
 
@@ -67,7 +33,7 @@ cd docker-compose-sonarqube
 docker-compose up -d
 ```
 
-SonarQube should be up and running. Try to access it by going to http://localhost:9000
+SonarQube should be up and running. Try to access it by going to <http://localhost:9000>
 
 ## Editing the docker-compose file
 
@@ -92,18 +58,8 @@ The example configurations in sonar.properties to connect with AD through ldaps 
 
 ## License
 
-[Robin Cher - MIT LICENSE ](https://github.com/robincher/docker-compose-sonarqube/blob/master/LICENSE)
+[Robin Cher - MIT LICENSE](https://github.com/robincher/docker-compose-sonarqube/blob/master/LICENSE)
 
-## Useful Commands
+### Precaution
 
-Some useful commands for testing the set-up
-
-### LDAP Binding Test
-
-```
-ldapwhoami -vvvv -H ldaps://ldapserver  -D "service_account@domain" -W
-```
-
-## Reference
-
-1. Adding TrustStore - https://github.com/SonarSource/docker-sonarqube/issues/207
+To build in a VM environment, you need to set the permissions of the opt/sonarqube folder to 777.

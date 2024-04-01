@@ -5,30 +5,30 @@ services:
     image: nginx:latest
     container_name: nginx
     ports:
-      - 443:443
+      - 80:80
     volumes:
-      - /opt/nginx/yourhost.xyz.key:/etc/nginx/yourhost.xyz.key:ro
-      - /opt/nginx/yourhost.xyz.crt:/etc/nginx/yourhost.xyz.crt:ro
-      - /opt/nginx/sonarqube.conf:/etc/nginx/conf.d/sonarqube.conf:z
+      - /home/mp_11115/sonar/opt/nginx/program.com.tw.key:$YOUR_NGINX_KEY_PATH
+      - /home/mp_11115/sonar/opt/nginx/program.com.tw.crt:$YOUR_NGINX_CERT_PATH
+      - /home/mp_11115/sonar/opt/nginx/sonarqube.conf:/etc/nginx/conf.d/sonarqube.conf:z
     networks:
       - sonarnet
     restart: always
 
   database:
-    image: postgres:10
+    image: postgres:12
     container_name: postgresql
     networks:
       - sonarnet
     environment:
-      - POSTGRES_USER=xxxx
-      - POSTGRES_PASSWORD=xxxx
-      - POSTGRES_DB=sonarqube
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+      POSTGRES_DB: sonarqube
     volumes:
-      - /opt/postgresql:/var/lib/postgresql:z
-      - /opt/postgresql/data:/var/lib/postgresql/data:z
+      - /home/mp_11115/sonar/opt/postgresql:/var/lib/postgresql:z
+      - /home/mp_11115/sonar/opt/postgresql/data:/var/lib/postgresql/data:z
 
   sonarqube:
-    image: sonarqube:latest
+    image: sonarqube:community
     container_name: sonarqube
     hostname: sonarqube
     networks:
@@ -38,12 +38,13 @@ services:
     ports:
       - 9000:9000
     environment:
-      - sonar.jdbc.url=jdbc:postgresql://database:5432/sonarqube
+      SONAR_JDBC_URL: jdbc:postgresql://database:5432/sonarqube
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
     volumes:
-      - /opt/sonarqube/conf:/opt/sonarqube/conf:z
-      - /opt/sonarqube/extensions/plugins:/opt/sonarqube/extensions/plugins:z
-      - /opt/sonarqube/extensions/downloads:/opt/sonarqube/extensions/downloads:z
-      - /opt/sonarqube/data:/opt/sonarqube/data:z
+      - /home/mp_11115/sonar/opt/sonarqube/extensions:/opt/sonarqube/extensions:z
+      - /home/mp_11115/sonar/opt/sonarqube/logs:/opt/sonarqube/logs:z
+      - /home/mp_11115/sonar/opt/sonarqube/data:/opt/sonarqube/data:z
 
 networks:
   sonarnet:
